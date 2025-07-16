@@ -14,13 +14,24 @@ The goal: build secure cloud infrastructure by design—not as an afterthought.
   - Checkov
   - tfsec
   - KICS
-- Remediation using Terraform best practices
+- Remediation using:
+  - Terraform best practices
+  - A custom-built Python auto-remediation script
 
 ##  Project Structure
 
-├── terraform/ # Insecure IaC examples
-├── terraform/secure_versions/ # Hardened versions after remediation
-├── scans/ # Static analysis output
+iac-security-misconfig-fixes/
+├── terraform/
+│ ├── ec2_public.tf
+│ ├── s3_unencrypted.tf
+│ ├── iam_overprivileged.tf
+│ └── secure_versions/
+│ ├── ec2_secure.tf
+│ ├── s3_secure.tf
+│ └── iam_secure.tf
+├── scans/
+│ └── checkov_results.txt
+├── auto_fix.py
 └── README.md
 
 ##  Examples of What Was Fixed
@@ -29,26 +40,32 @@ The goal: build secure cloud infrastructure by design—not as an afterthought.
 |-------------------|----------------------------------------|----------------------------------|
 | Security Group     | SSH open to 0.0.0.0/0                 | Restricted to internal CIDR     |
 | S3 Bucket          | No encryption, public access         | Enforced AES256 + private ACL   |
-| IAM Policy         | Wildcard `"*"` on Action + Resource  | Scoped to `s3:GetObject` only   |
+| IAM Policy         | Wildcard "*" on Action + Resource  | Scoped to 's3:GetObject' only   |
+
+##  Automation with Python
+
+To go beyond detection, I created a Python script ('auto_fix_misconfig') that identifies common insecure patterns and rewrites hardened Terraform configurations automatically. This simulates a real-world auto-remediation pipeline.
+''' python3 auto_fix_misconfig.py
+
+Output files are saved in terraform/secure_versions/
 
 ##  Tools Used
 
 - [Checkov](https://github.com/bridgecrewio/checkov)
 - [tfsec](https://github.com/aquasecurity/tfsec)
 - [KICS](https://github.com/Checkmarx/kics)
-- GitHub Actions (planned)
 
 ## Why I Built This
 
-Most cloud breaches start with misconfigured infrastructure. I wanted to gain hands-on experience not just in identifying those misconfigs—but actually fixing them.
+Misconfigurations are one of the leading causes of cloud breaches. I wanted to go beyond theory, by replicating the mistakes that actually happen in production and practicing how to fix them with repeatability, documentation, and automation.
 
-This project simulates real-world issues and shows how they can be remediated in a structured, automated, and version-controlled way.
+This hands-on project allowed me to combine scanning tools, remediation strategies, and scripting to simulate real-world incident handling from start to resolution.
 
 ## Key Learnings
 
-- Scanning tools are only useful if you take action on the results
-- Secure defaults matter, especially with IAM and networking
-- Documentation and automation go hand-in-hand for scalable remediation
+- Scans are just the beginning, fixing the root issue is the real value
+- IAM and Security Group defaults should be secure, not permissive
+- Automation scales, codifying fixes helps teams enforce policies efficiently
 
 ##  Live Repo
 
