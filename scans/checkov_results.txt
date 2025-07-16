@@ -1,0 +1,242 @@
+
+
+       _               _
+   ___| |__   ___  ___| | _______   __
+  / __| '_ \ / _ \/ __| |/ / _ \ \ / /
+ | (__| | | |  __/ (__|   < (_) \ V /
+  \___|_| |_|\___|\___|_|\_\___/ \_/
+
+By Prisma Cloud | version: 3.2.450 
+Update available 3.2.450 -> 3.2.451
+Run pip3 install -U checkov to update 
+
+
+terraform scan results:
+
+Passed checks: 4, Failed checks: 11, Skipped checks: 0
+
+Check: CKV_AWS_260: "Ensure no security groups allow ingress from 0.0.0.0:0 to port 80"
+	PASSED for resource: aws_security_group.open_sg
+	File: /ec2_public.tf:1-18
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-networking-policies/ensure-aws-security-groups-do-not-allow-ingress-from-00000-to-port-80
+Check: CKV_AWS_277: "Ensure no security groups allow ingress from 0.0.0.0:0 to port -1"
+	PASSED for resource: aws_security_group.open_sg
+	File: /ec2_public.tf:1-18
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-networking-policies/ensure-aws-security-group-does-not-allow-all-traffic-on-all-ports
+Check: CKV_AWS_25: "Ensure no security groups allow ingress from 0.0.0.0:0 to port 3389"
+	PASSED for resource: aws_security_group.open_sg
+	File: /ec2_public.tf:1-18
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-networking-policies/networking-2
+Check: CKV_AWS_93: "Ensure S3 bucket policy does not lockout all but root user. (Prevent lockouts needing root account fixes)"
+	PASSED for resource: aws_s3_bucket.public_bucket
+	File: /s3_unencrypted.tf:1-4
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/s3-policies/bc-aws-s3-24
+Check: CKV_AWS_24: "Ensure no security groups allow ingress from 0.0.0.0:0 to port 22"
+	FAILED for resource: aws_security_group.open_sg
+	File: /ec2_public.tf:1-18
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-networking-policies/networking-1-port-security
+
+		1  | resource "aws_security_group" "open_sg" {
+		2  |   name        = "open_sg"
+		3  |   description = "Open SG"
+		4  | 
+		5  |   ingress {
+		6  |     from_port   = 22
+		7  |     to_port     = 22
+		8  |     protocol    = "tcp"
+		9  |     cidr_blocks = ["0.0.0.0/0"]
+		10 |   }
+		11 | 
+		12 |   egress {
+		13 |     from_port   = 0
+		14 |     to_port     = 0
+		15 |     protocol    = "-1"
+		16 |     cidr_blocks = ["0.0.0.0/0"]
+		17 |   }
+		18 | }
+
+Check: CKV_AWS_23: "Ensure every security group and rule has a description"
+	FAILED for resource: aws_security_group.open_sg
+	File: /ec2_public.tf:1-18
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-networking-policies/networking-31
+
+		1  | resource "aws_security_group" "open_sg" {
+		2  |   name        = "open_sg"
+		3  |   description = "Open SG"
+		4  | 
+		5  |   ingress {
+		6  |     from_port   = 22
+		7  |     to_port     = 22
+		8  |     protocol    = "tcp"
+		9  |     cidr_blocks = ["0.0.0.0/0"]
+		10 |   }
+		11 | 
+		12 |   egress {
+		13 |     from_port   = 0
+		14 |     to_port     = 0
+		15 |     protocol    = "-1"
+		16 |     cidr_blocks = ["0.0.0.0/0"]
+		17 |   }
+		18 | }
+
+Check: CKV_AWS_382: "Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
+	FAILED for resource: aws_security_group.open_sg
+	File: /ec2_public.tf:1-18
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-networking-policies/bc-aws-382
+
+		1  | resource "aws_security_group" "open_sg" {
+		2  |   name        = "open_sg"
+		3  |   description = "Open SG"
+		4  | 
+		5  |   ingress {
+		6  |     from_port   = 22
+		7  |     to_port     = 22
+		8  |     protocol    = "tcp"
+		9  |     cidr_blocks = ["0.0.0.0/0"]
+		10 |   }
+		11 | 
+		12 |   egress {
+		13 |     from_port   = 0
+		14 |     to_port     = 0
+		15 |     protocol    = "-1"
+		16 |     cidr_blocks = ["0.0.0.0/0"]
+		17 |   }
+		18 | }
+
+Check: CKV_AWS_288: "Ensure IAM policies does not allow data exfiltration"
+	FAILED for resource: aws_iam_policy.overprivileged
+	File: /iam_overprivileged.tf:1-11
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-iam-policies/bc-aws-288
+
+		1  | resource "aws_iam_policy" "overprivileged" {
+		2  |   name   = "wildcard-policy"
+		3  |   policy = jsonencode({
+		4  |     Version = "2012-10-17"
+		5  |     Statement = [{
+		6  |       Action   = "*"
+		7  |       Effect   = "Allow"
+		8  |       Resource = "*"
+		9  |     }]
+		10 |   })
+		11 | }
+
+Check: CKV_AWS_290: "Ensure IAM policies does not allow write access without constraints"
+	FAILED for resource: aws_iam_policy.overprivileged
+	File: /iam_overprivileged.tf:1-11
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-iam-policies/bc-aws-290
+
+		1  | resource "aws_iam_policy" "overprivileged" {
+		2  |   name   = "wildcard-policy"
+		3  |   policy = jsonencode({
+		4  |     Version = "2012-10-17"
+		5  |     Statement = [{
+		6  |       Action   = "*"
+		7  |       Effect   = "Allow"
+		8  |       Resource = "*"
+		9  |     }]
+		10 |   })
+		11 | }
+
+Check: CKV_AWS_287: "Ensure IAM policies does not allow credentials exposure"
+	FAILED for resource: aws_iam_policy.overprivileged
+	File: /iam_overprivileged.tf:1-11
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-iam-policies/bc-aws-287
+
+		1  | resource "aws_iam_policy" "overprivileged" {
+		2  |   name   = "wildcard-policy"
+		3  |   policy = jsonencode({
+		4  |     Version = "2012-10-17"
+		5  |     Statement = [{
+		6  |       Action   = "*"
+		7  |       Effect   = "Allow"
+		8  |       Resource = "*"
+		9  |     }]
+		10 |   })
+		11 | }
+
+Check: CKV_AWS_63: "Ensure no IAM policies documents allow "*" as a statement's actions"
+	FAILED for resource: aws_iam_policy.overprivileged
+	File: /iam_overprivileged.tf:1-11
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-iam-policies/iam-48
+
+		1  | resource "aws_iam_policy" "overprivileged" {
+		2  |   name   = "wildcard-policy"
+		3  |   policy = jsonencode({
+		4  |     Version = "2012-10-17"
+		5  |     Statement = [{
+		6  |       Action   = "*"
+		7  |       Effect   = "Allow"
+		8  |       Resource = "*"
+		9  |     }]
+		10 |   })
+		11 | }
+
+Check: CKV_AWS_289: "Ensure IAM policies does not allow permissions management / resource exposure without constraints"
+	FAILED for resource: aws_iam_policy.overprivileged
+	File: /iam_overprivileged.tf:1-11
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-iam-policies/bc-aws-289
+
+		1  | resource "aws_iam_policy" "overprivileged" {
+		2  |   name   = "wildcard-policy"
+		3  |   policy = jsonencode({
+		4  |     Version = "2012-10-17"
+		5  |     Statement = [{
+		6  |       Action   = "*"
+		7  |       Effect   = "Allow"
+		8  |       Resource = "*"
+		9  |     }]
+		10 |   })
+		11 | }
+
+Check: CKV_AWS_62: "Ensure IAM policies that allow full "*-*" administrative privileges are not created"
+	FAILED for resource: aws_iam_policy.overprivileged
+	File: /iam_overprivileged.tf:1-11
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-iam-policies/bc-aws-iam-45
+
+		1  | resource "aws_iam_policy" "overprivileged" {
+		2  |   name   = "wildcard-policy"
+		3  |   policy = jsonencode({
+		4  |     Version = "2012-10-17"
+		5  |     Statement = [{
+		6  |       Action   = "*"
+		7  |       Effect   = "Allow"
+		8  |       Resource = "*"
+		9  |     }]
+		10 |   })
+		11 | }
+
+Check: CKV_AWS_355: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"
+	FAILED for resource: aws_iam_policy.overprivileged
+	File: /iam_overprivileged.tf:1-11
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-iam-policies/bc-aws-355
+
+		1  | resource "aws_iam_policy" "overprivileged" {
+		2  |   name   = "wildcard-policy"
+		3  |   policy = jsonencode({
+		4  |     Version = "2012-10-17"
+		5  |     Statement = [{
+		6  |       Action   = "*"
+		7  |       Effect   = "Allow"
+		8  |       Resource = "*"
+		9  |     }]
+		10 |   })
+		11 | }
+
+Check: CKV_AWS_286: "Ensure IAM policies does not allow privilege escalation"
+	FAILED for resource: aws_iam_policy.overprivileged
+	File: /iam_overprivileged.tf:1-11
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-iam-policies/bc-aws-286
+
+		1  | resource "aws_iam_policy" "overprivileged" {
+		2  |   name   = "wildcard-policy"
+		3  |   policy = jsonencode({
+		4  |     Version = "2012-10-17"
+		5  |     Statement = [{
+		6  |       Action   = "*"
+		7  |       Effect   = "Allow"
+		8  |       Resource = "*"
+		9  |     }]
+		10 |   })
+		11 | }
+
+
