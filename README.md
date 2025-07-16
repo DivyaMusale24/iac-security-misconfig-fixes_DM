@@ -2,7 +2,7 @@
 
 This project highlights common security misconfigurations in Terraform infrastructure and how to detect and fix them using open-source tools.
 
-The goal: build secure cloud infrastructure by design—not as an afterthought.
+The goal: build secure cloud infrastructure by design, not as an afterthought.
 
 ##  What This Project Covers
 
